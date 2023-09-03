@@ -3,6 +3,7 @@ package atm.bloodworkxgaming.serverstarter
 import atm.bloodworkxgaming.serverstarter.ServerStarter.Companion.LOGGER
 import atm.bloodworkxgaming.serverstarter.config.AdditionalFile
 import atm.bloodworkxgaming.serverstarter.config.ConfigFile
+import atm.bloodworkxgaming.serverstarter.config.processString
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.IOException
@@ -47,6 +48,14 @@ class FileManager(private val configFile: ConfigFile, private val internetManage
             try {
                 if (File(localFile.from).isDirectory) {
                     FileUtils.copyDirectory(File(localFile.from), File(localFile.to))
+                } else if (localFile.from.endsWith("*") && File(localFile.to).isDirectory) {
+                    for (file in File(localFile.from.removeSuffix("*")).list()) {
+                        if (File(localFile.from.removeSuffix("*"), file).isDirectory) {
+                            FileUtils.copyDirectory(File(localFile.from.removeSuffix("*"), file), File(localFile.to, file))
+                        } else {
+                            FileUtils.copyFile(File(localFile.from.removeSuffix("*"), file), File(localFile.to, file))
+                        }
+                    }
                 } else {
                     FileUtils.copyFile(File(localFile.from), File(localFile.to))
                 }
